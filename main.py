@@ -26,6 +26,12 @@ MIN_CHARS = 1
 MAX_CHARS = 400
 
 
+def output_path() -> str:
+    """Where the entry goes. MAKEFUN_OUTPUT overrides the default
+    so the gate can be exercised locally without touching /output."""
+    return os.environ.get("MAKEFUN_OUTPUT", "/output/entry.txt")
+
+
 def main() -> None:
     text = RANT.strip()
     if not (MIN_CHARS <= len(text) <= MAX_CHARS):
@@ -34,8 +40,9 @@ def main() -> None:
         raise ValueError("entry must not be only white space")
     if "\n" in text:
         raise ValueError("entry must be a single line")
-    os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8") as f:
+    path = output_path()
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
         f.write(text)
     # Echo the entry so the run log shows exactly what was graded.
     print(f"entry ({len(text)} chars): {text}")
